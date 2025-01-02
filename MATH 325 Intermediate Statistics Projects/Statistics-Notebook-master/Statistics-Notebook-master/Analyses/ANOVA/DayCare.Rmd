@@ -1,11 +1,9 @@
 ---
 title: "Day Care Fines"
 output:
-  github_document:
+  html_document:
     theme: cerulean
     code_folding: hide
-  html_document:
-    df_print: paged
 ---
 
 
