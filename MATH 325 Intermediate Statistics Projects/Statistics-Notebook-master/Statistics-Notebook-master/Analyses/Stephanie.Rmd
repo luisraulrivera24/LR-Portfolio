@@ -1,0 +1,107 @@
+---
+title: "Stephanie's Housing Request"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+
+**Week 2 Analysis**
+
+```{r message=FALSE, warning=FALSE}
+library(mosaic)
+library(tidyverse)
+library(pander)
+library(DT) # If you get an error stating: 
+            # Error in library(DT): there is no package called 'DT'
+            # You will need to run: install.packages("DT") 
+            # in your Console, then try "Knit HTML" again.
+Rent <- read_csv("../Data/Rent.csv")
+```
+
+<br />
+
+## Background
+
+Stephanie[^1] is a student that will be starting school at BYU-Idaho next semester. Suppose she sent you the following email.
+
+----
+
+"Hi. My name is Stephanie. I would like to learn about what housing options I have for living at BYU-Idaho next semester. It will be my first semester there, so I would like to find something that is close to campus and around $300 a month in rent. I'm not too picky on roommates, but I would like somewhere that has a lot of people around so I can get to know as many people as possible. Thanks in advance!"
+
+----
+
+Write your response to Stephanie below. Use the "Rent" dataset, good statistical analysis, and clear writing to make some well supported suggestions to her about apartments that meet her stated criterions. You are free to use other criterion that you think she might find more meaningful as well.
+
+## Response
+
+Dear Stephanie,
+
+From what I understand, you are looking for housing that is 1) close to campus, 2) around $300 a month, and 3) a place with a lot of people around. I want you to learn from my data what apartment options are best for you.
+
+Below, you will see a data table outlining all of the single student housing options for females. The arrows on each column of the data table are to sort the highest (up arrow) or lowest (down arrow) amount for the designated column you are clicking it for. Housing is organized based on the arrow you click of the column. If you look below that, you will see the scatterplot I created.
+
+I created a scatterplot which includes all of these variables that are important to you to decide what housing contract to get. I titled my scatterplot they way I did because my scatterplot compares all of the single female student housing. The X-axis represents the price per housing and the Y-axis represents the number of minutes it will take you to get to campus for each apartment. Also, you will notice that the data has some dots that are bigger than others. The size of each dot is dependent on the capacity of the apartment complex. The bigger the dot is, the greater the capacity of that apartment complex, and vice versa.
+
+You mentioned you want an apartment where you spend about $300/month, this is about $900 a semester since a semester is about 3 months. Therefore, the prices I show are for the entire semester for each housing contract. What I did is I multiplied your $300/month by three to show the total amount you would spend per semester.This is how prices are shown in the data tables and scatterplot.
+
+Conclusion
+
+You have a couple of options. I am going to name 3 for you. The first option is "Aspen Village." It is 6 minutes away from campus, the price is $900/semester and the capacity is 210 people. It will definitely give you plenty of people to socialize with. Another option is "Birch Plaza." The price is $980/semester, it is 1 minute from campus and has a capacity of 343 people. Another option is the "Brooklyn Apartments." The price is $870/semester, it is 7 minutes away from campus and has a capacity of 144 people.
+
+I have also attached a data table below the scatterplot for these specific three apartments I recommend looking at. Now you have 1) a data table to look at all of the single female student housing available, 2) a scatterplot displaying information through the three important variables to you, and 3) a data table right below that where I give my top three housing options for you.
+
+Thank you!
+
+
+<!-- Hint, you should probably subset the Rent dataset to only show the "Approved Women's Housing" since Stephanie won't be interested in Male Housing options. Notice how this text in green doesn't show up in the HTML output because we used the HTML comment tags around this text. --> 
+
+```{r message=FALSE, warning=FALSE}
+# Code to get you started, be sure to use a subset of Rent instead of Rent in this code though.
+library(plotly)
+
+Rent2<-filter(Rent,Gender=="F")
+
+Rent2<-select(Rent2, c('Apartment','Price','WalkingMinutes','Capacity'))
+
+datatable(Rent2, options=list(lengthMenu = c(10,10,10,10,10,7)), extensions="Responsive")
+
+plot_ly(Rent2, 
+        x= ~Price, 
+        y= ~WalkingMinutes,
+        color= ('brown1'),
+        size= ~Capacity, 
+        text= ~paste('Apartment:', Apartment, '\n', 'Price:', Price, '\n', 'Walking Minutes:', WalkingMinutes, '\n', 'Capacity:', Capacity),
+        colors=c('brown1')) %>%
+  layout(title='BYU-I Single Student Housing Comparison (Females)', 
+         xaxis=list(title='Price'),
+         yaxis=list(title='Walking Minutes')) %>%
+  layout(annotations = list(x = 1, y = -0.1, text = "*size of dot is equal to capacity size",
+      showarrow = F, xref='paper', yref='paper', 
+      xanchor='right', yanchor='auto', xshift=0, yshift=0,
+      font=list(size=12, color="red")))
+
+Rent3 <- select(Rent2, c('Apartment','Price','WalkingMinutes','Capacity'))
+
+Rent3 <- filter(Rent3, Apartment %in% c("ASPEN VILLAGE - WOMEN","BIRCH PLAZA","BROOKLYN APARTMENTS"))
+
+datatable(Rent3, options=list(lengthMenu = c(3)), extensions="Responsive")
+
+#OR
+
+#datatable(Rent3)
+```
+
+
+
+
+
+
+
+
+
+
+
+[^1]: Note that Stephanie is a fictional character who is based on real experiences of many faculty and staff here at BYU-Idaho.

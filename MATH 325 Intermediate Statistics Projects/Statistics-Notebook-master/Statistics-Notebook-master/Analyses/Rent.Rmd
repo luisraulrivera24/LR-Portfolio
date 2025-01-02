@@ -1,0 +1,88 @@
+---
+title: "Rent"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+
+<!-- Welcome to the first Analysis for Math 325! 
+The goal of this first assignment is to have you produce a graphical summary and a numerical summary of the "Rent" data set. The fun part is that you get to decide what type of graph and what type of numerical summary to create! You will need to read through the "green text" instructions of this document to find the places where you are supposed to enter R-code in order to complete the assignment. -->
+
+
+**Week 1 Analysis**
+
+```{r, message=FALSE, warning=FALSE}
+# This gray area is called an "R-chunk". 
+# These library commands install some powerful functions for your use later on.
+library(mosaic)
+library(pander)
+library(tidyverse)
+library(DT) 
+library(ggplot2)
+# This read_csv command reads in the "Rent" data set into an object called "Rent"
+Rent <- read_csv("../Data/Rent.csv")
+
+# To load this data set into your R-Console do the following:
+#  1. From your top file menu select "Session -> Set Working Directory -> To Source File Location"
+#  2. Press the green "play button" in the top right corner of this gray box (which is called an "R-chunk").
+#  3. Then in your "Console" window of 
+```
+
+<br />
+
+## Background
+
+Here is a data table showing the available approved housing apartment options at BYU-Idaho for single students. There are 122 entries comprising 57 female and 65 male apartment options.
+
+```{r, warning=FALSE}
+# Code to get you started. 
+# View(...) works great in the Console, but datatable(...) must be
+# used instead within an R-chunk.
+datatable(Rent, options=list(lengthMenu = c(3,10,30)), extensions="Responsive")
+```
+
+
+## Graphic
+
+<!-- Present an interesting graphic using the Rent data set. Do not create the same graphics that are shown in the [Good Example Analysis](./Analyses/StudentHousing.html), but you can certainly use those graphics as a guide to inspire you on what to do yourself. -->
+
+
+```{r}
+# Use this R-chunk to...
+# ...Create an interesting graphic using the Rent data set.
+
+ggplot(Rent, aes(x=FloorPlans, y=Deposit))+geom_point()+ labs(title='BYU-I Single Student Housing Floor Plans and Deposits Per Apartment Complex')
+#ggplot(Rent, aes(x=FloorPlans, y=Deposit))+geom_point(color = 'green', pch = 18)+labs(title='BYU-I Single Student Housing Floor Plans and Deposits Per Apartment Complex')
+
+```
+
+
+<!-- Write a few statements here that explain your graphic and what it shows. -->
+
+My hypothesis was that if there is more floor plans in an apartment complex, renting an apartment will have a smaller deposit necessary (and vice versa).The alternative hypothesis is that there is no correlation between floor plans and deposit amount. What I decided to do was create a scatterplot and I quickly realized that there is no strong correlation between the number of floor plans an apartment complex has and the deposit amount (in BYU-I student housing). In the graphical summary, we can see that from 0-10 floor plans, there is a square figure of plotted points, clearly stating there is no correlation.
+
+
+
+
+```{r}
+# Use this R-chunk to...
+# ...compute and display a meaningful table of numerical summaries supporting your above graphic.
+
+pander(cor(Rent$FloorPlans, Rent$Deposit))
+#[1] -0.09067653
+
+```
+
+<!-- Write a few statements here that introduce your table of numerical summaries and what they show. -->
+
+The table of numerical summaries that I decided to use was the correlation numerical summary. I wanted to see if there is any correlation at all between the number of floor plans in BYU-I single apartments and the deposit amount. The correlation was -0.09. This means that there is hardly any correlation at all between floor plans and deposit amount. 
+
+
+## Conclusion
+
+My graphic and numerical summaries both support very well that floor plans for single student housing doesn't have a strong correlation with their deposit amount. When floor plans increase, the deposit amount doesn't increase. When floor plans decrease, the deposit amount doesn't decrease. You can clearly see a square of plots formed in the graphical summary from 0-10 floor plans. The numerical summary was a summary of the correlation between floor plans and deposit amount per BYU-I single student housing.The correlation was -0.09. This means that there is hardly any correlation. In conclusion, this study showed that the number of floor plans of BYU-I single student housing doesn't help predict the deposit amount for each student housing.
+
+

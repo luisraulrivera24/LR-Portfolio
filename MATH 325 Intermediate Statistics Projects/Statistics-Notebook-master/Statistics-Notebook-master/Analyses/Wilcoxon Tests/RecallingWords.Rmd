@@ -1,0 +1,198 @@
+---
+title: "Recalling Words"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+```{r, include=FALSE}
+library(mosaic)
+library(car)
+library(pander)
+library(DT) #You may need to run: install.packages("DT") 
+```
+
+```{r, eval=FALSE}
+# Play the chunk above and this one to get the data into your Console
+View(Friendly)
+?Friendly
+```
+
+
+<br />
+
+#### Background
+
+Many teachers and other educators are interested in understanding how to best deliver new content to students. In general, they have two choices of how to do this.
+
+1. The Meshed Approach
+    * Deliver new content while simultaneously reviewing previously understood content.
+
+2. The Before Approach
+    * Deliver new content after fully reviewing previously understood content.
+
+A study was performed to determine whether the *Meshed* or *Before* approaches to delivering content had any positive benefits on memory recall. 
+
+<div style="padding-left:15px;">
+
+##### <a href="javascript:showhide('uniquename')">The Experiment <span style="font-size:8pt;">(click to view)</span></a>
+
+
+<div id="uniquename" style="display:none;">
+
+Individuals were seated at a computer and shown a list of words. Words appeared on the screen one at a time, for two seconds each, until all words had been shown (40 total). After all words were shown, they were required to perform a few two-digit mathematical additions (like 15 + 25) for 15 seconds to avoid immediate memory recall of the words. They were then asked to write down as many of the 40 words as they could remember. They were given a maximum of 5.3 minutes to recall words.
+
+The process of showing words and recalling words was repeated four times with the same list of words each time (four chances to get it right). The presentation of the first trial was the same for all treatment conditions. However, trials 2, 3, and 4 were slightly different for each treatment condition.
+
+<div style="padding-left:15px;">
+
+The `SFR` group (the control group) stands for Standard Free Recall. In all four trials the same list of 40 words was presented, in a random order each time.
+
+The `Before` group also used the same 40 words during each trial. However, any words that were correctly recalled in a previous trial were presented first, or *before* the words that were not recalled in the last trial. After all the correct words were presented in random order, the non-recalled words were presented in a random order.
+
+The `Meshed` group also used the same 40 words during each trial. However, words that were correctly recalled in a previous trial were alternated with a missed word during the next presentation order. 
+
+</div>
+
+The data records the number of correctly recalled words (out of the 40 possible) from the fourth trial. Results were obtained for 30 students, 10 in each of the three treatment groups: `SFR`, `Before`, and `Meshed`. 
+
+</div>
+
+##### <a href="javascript:showhide('uniquename2')">The Data <span style="font-size:8pt;">(click to view)</span></a>
+
+<div id="uniquename2" style="display:none;">
+
+The results from the study can be found in the `Friendly` data set in R after loading `library(car)`. 
+
+Click the "Code" button to see the data.
+
+</div>
+</div>
+
+<br />
+
+
+<!-- Begin writing your analysis below here. -->
+
+<!-- Note that your goal is to use the Friendly data to show whether or not the Meshed or Before methods have any positive benefit on memory recall. -->
+
+
+## Introduction:
+
+The point of my Wilcoxon Rank Sum (Mann-Whitney) Test is to see whether the Meshed Approach to delivering new content to students has a positive benefit on memory recall. The Wilcoxon Rank Sum Test is appropriate for this analysis because the variables are independent variables and the sample size is small (you can see this in my summary code).
+
+## Question:
+
+The question I am trying to answer is: 
+
+Does the Meshed Approach to delivering new content to students have a positive benefit on memory recall?
+
+## Hypothesis and Alternative Hypothesis:
+
+$$
+  H_0: \text{difference in medians of the Meshed Approach group and the SFR group=0}
+$$
+$$
+  H_a: \text{difference in medians of the Meshed Approach group and the SFR group>0}
+$$
+
+(the alternative hypothesis means that the Meshed Approach has a positive benefit on memory recall)
+
+Significance level will be: α=0.05
+
+## Data Analysis:
+
+```{r message=FALSE, warning=FALSE}
+
+#Use Wilcox tests when data is not normal OR has a small sample size (<30)
+
+Friendly1 <- droplevels(filter(Friendly, condition %in% c('SFR','Meshed')))
+
+datatable(Friendly1, options=list(lengthMenu = c(10,10)))
+
+Friendly1SFR <- filter(Friendly1, condition %in% c('SFR'))
+
+Friendly1Meshed <- filter(Friendly1, condition %in% c('Meshed'))
+
+```
+
+Here is a table of the data I analyze.
+
+```{r message=FALSE, warning=FALSE}
+summary(Friendly1) %>% 
+  pander()
+
+```
+
+Here is a summary of the data which shows the sample size of the Meshed and SFR group is 10 for each. Now, I will conduct a QQPlot to see if the data is normally distributed.
+
+```{r message=FALSE, warning=FALSE}
+qqPlot(correct ~ condition, data=Friendly1, ylab='Number of Correctly Recalled Words', main='Meshed Group QQPlot')
+
+```
+
+Although the sample size for each group is below 30, the QQPlots show that the data for the Meshed and SFR group is normally distributed. This means we can conduct an independent samples t-test. However, for the purposes of this analysis, we will be conducting a Wilcoxon Rank Sum (Mann-Whitney) Test.
+
+```{r message=FALSE, warning=FALSE}
+wilcox.test(Friendly1Meshed$correct,Friendly1SFR$correct, mu = 0, alternative = 'greater', conf.level = 0.95) %>%
+     pander()
+
+```
+
+My Wilcoxon Rank Sum (Mann-Whitney) Test has insufficient evidence to say that the Meshed Approach has a positive benefit on memory recall. The P-value is 0.05075. This is greater than my alpha of 0.05.  
+
+## Graphical Summary:
+
+```{r message=FALSE, warning=FALSE}
+
+#Use Wilcox tests when data is not normal OR has a small sample size (<30)
+
+ggplot(Friendly1, aes(x=factor(condition), y=correct))+ 
+   coord_flip( )+ 
+   geom_dotplot(binaxis = 'y', stackdir = 'up', position = 'dodge', dotsize = 0.75, binwidth = 0.5)+ 
+   labs(title='Difference in Medians Between \n Meshed Approach and SFR (the control group)', x='Condition', y='Number of Correctly Recalled Words')
+
+``` 
+
+For my graphical summary, I made a dot plot because there is not that much data for the SFR (control) group and the Meshed Approach group. From the dot plot, we can see that the Meshed Approach group number of correctly recalled words are about 30 and higher. For the SFR (control group), the data ranges from a little more than 20 to around 36 correctly recalled words. Therefore, the number of correctly recalled words is on average higher for the Meshed Approach group than for the SFR group.
+
+## Numerical Summary:
+
+```{r message=FALSE, warning=FALSE}
+
+#Use Wilcox tests when data is not normal OR has a small sample size (<30)
+
+Friendly1 %>%
+    group_by(condition) %>%
+    summarise(Min=min(correct),Max=max(correct),Median=median(correct),
+              Mean=mean(correct),Sample_Size = n()) %>%
+    pander()
+
+```
+
+For my numerical summary, I conducted a summary of what is shown in the dot plot. This summary includes the minimum, maximum, median, and mean of the number of correctly recalled words for the SFR (control) group and the Meshed Approach group. The median for the Meshed Approach group is 36.5 and the mean is 36.6. The median for the SFR (control) group is 27 and the mean 30.3. 
+
+## Interpretation/Conclusion:
+
+Based off of my Wilcoxon Rank Sum (Mann-Whitney) Test, we have insufficient evidence to say the difference in medians of the Meshed Approach and the SFR group is greater than zero. This means that the Meshed Approach to delivering new content to students does not show better memory recall than the SFR (control) group. The null hypothesis (difference in medians of the Meshed Approach group and the SFR group=0) stands.
+
+
+
+
+
+
+
+
+
+
+
+
+

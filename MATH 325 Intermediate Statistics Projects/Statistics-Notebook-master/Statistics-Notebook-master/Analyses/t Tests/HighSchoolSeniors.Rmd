@@ -1,0 +1,133 @@
+---
+title: "High School Seniors t Test"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+## Introduction
+
+What I wanted to test is if High School Seniors find conserving water to be more important than having internet access. Therefore, in order to test this, I conducted a paired t-test. Even though I am trying to figure out if high school seniors think overall that conserving water is more important than having internet access, the same group of high school seniors is used in gathering information on importance of conserving water and internet access.
+
+## Question
+
+The question I am trying to answer is: Do High School Seniors (based off of the census) believe conserving water is more important than internet access?
+
+## Hypothesis and Alternative Hypothesis
+
+H0:μd=0 (the differences are zero, which means there is no significant difference)
+
+Ha:μd>0 (the importance rating for conserving water is greater, which is why the difference will be greater than zero.)
+
+My alpha is .05.
+
+## Data Analysis
+
+What I first did was first make sure that my sample of differences would be representative of the population differences, which it is because this is a census.
+Then, I created a QQPlot. The point of the QQPlot is to make sure the difference between the importance of conserving water rating and the importance rating for internet access is normally distributed, which it is. I took out the outliers in my QQPlot and all of my tests that will follow. I did this so that my data will be as accurate as possible. The way I did this is by getting rid of all ratings from the High School Seniors that were greater than 1000. The reason for this is because the High School Seniors were asked to rate from a scale of 0 to 1,000. The outliers are all those ratings that are past 1,000, which are the ones I took off the data.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE,id=FALSE}
+library(tidyverse)
+library(DT)
+library(pander)
+library(readr)
+
+HSS <- read_csv("../../Data/HighSchoolSeniors.csv")
+#HSS$Sleep_Hours_Schoolnight <- as.numeric(HSS$Sleep_Hours_Schoolnight)
+
+Omit1 <- filter(HSS, !is.na(Importance_conserving_water))
+
+Omit1 <- filter(Omit1, !is.na(Importance_Internet_access))
+
+library(car)
+#This filters the outliers (Omit)
+Omit<-filter(Omit1, Importance_conserving_water <= 1000)
+
+Omit<-filter(Omit, Importance_Internet_access <= 1000)
+
+#Omit<-select(Omit,  c(Importance_conserving_water,Importance_Internet_access))
+
+par(mfrow=c(1,2))
+
+qqPlot(Omit$Importance_conserving_water-Omit$Importance_Internet_access, ylab='Difference', ylim=c(-1000,1000),main='QQPlot For Difference Between \n Conserving Water Importance and \n Internet Access Importance',id=FALSE)
+
+#qqPlot(Omit1$Importance_conserving_water-Omit1$Importance_Internet_access, ylab='Difference', ylim=c(-10000,10000),main='QQPlot For Difference Between \n Conserving Water Importance and \n Internet Access Importance')
+
+#Omit %>% 
+#mutate(Differences= (Importance_conserving_water-Importance_Internet_access))
+```
+
+Then, I performed a t-test. My t-test shows the results for the difference between the conserving water importance rating and the internet access importance rating. I made the alternative hypothesis "greater" because I believed the rating for water importance would be higher amongst the high school seniors. I set my confidence interval to 0.95. My t-test was -3.617 and my p-value was 0.9998. Since my p-value is greater than my alpha, I have insufficient evidence to reject the null hypothesis. The mean of the differences was -70.73 which means that High School students on average rate internet access as more important than conserving water. To test if this is statistically significant, I would have to perform another test with the alternative hypothesis being that students on average rate the importance of internet access higher than the importance of conserving water.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+
+Differences <-(Omit$Importance_conserving_water-Omit$Importance_Internet_access)
+
+t.test(Differences, mu = 0, alternative = 'greater', conf.level = 0.95) %>%
+pander()
+```
+
+
+## Graphical Summary and Numerical Summary
+
+I also added a histogram. My histogram shows the difference between the rating for the importance of conserving water and the rating for the importance of internet access. In other words, for the importance of conserving water rating I subtracted the importance of internet access rating. The difference is displayed in the histogram. I also did a summary of the differences. The summary includes the minimum, 1st Quartile, Median, Mean, 3rd Quartile, and Max. This shows the differences data is slightly left skewed.
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+#par(mfrow=c(1,3))
+
+#hist(Omit$Importance_conserving_water,main='HS Seniors Importance Ratings \n Conserving Water',xlab='Importance of Conserving Water', col='firebrick')
+
+#hist(Omit$Importance_Internet_access,main='HS Seniors Importance Ratings \n Internet Access',xlab='Importance of Internet Access', col='firebrick')
+
+hist(Differences,main='HSS Difference Between \n Importance of Conserving Water \n and \n Importance of Internet Access',xlab='Difference', ylim=c(0,120),col='firebrick')
+```
+
+### Summary Table of the Differences
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+summary(Differences)%>% pander()
+```
+
+
+## Interpretation/Conclusion
+
+The results of my t-test show that I have insufficient evidence to reject the null hypothesis. In other words, there is insufficient evidence to conclude HSS see conserving water as more important than having internet access.The mean of the differences was -70.73 which means that High School students on average rate internet access as more important than conserving water. To test if this is statistically significant, I would have to perform another test with the alternative hypothesis being that students on average rate the importance of internet access higher than the importance of conserving water.
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+
+#Remember: select "Session, Set Working Directory, To Source File Location", and then play this R-chunk into your console to read the HSS data into R. 
+```
+
+<!-- Instructions
+
+1. Use the HSS dataset in R to come up with a question that can be answered with a t Test. 
+
+Here is a link to the survey given to the students that participated in the study:
+https://ww2.amstat.org/censusatschool/pdfs/C@SQuestionnaire.pdf
+(Use the link to learn about what each column of data in the data set represents.)
+
+2. Establish why your question is interesting and rephrase the question using a statistical "null" and "alternative" hypothesis. (Hint, see the "Math 325 Notebook -> R Help -> R-Markdown Hints" page of your textbook for instructions on how to write mathematical hypotheses.)
+
+3. Clearly answer your question using statistics. Be sure to compute a p-value and provide supporting numerical and graphical summaries.
+
+Note: you can create "groups" from the data in many ways. For example, suppose you wanted to create a variable that grouped people according to whether they thought recycling was more important than conserving water. You could do this by:
+
+```{r}
+HSS <- HSS %>%
+  mutate(recycling_than_water = ifelse(Importance_recycling_rubbish >	Importance_conserving_water, "Recycling More Important", "Water Conservation More Important"))
+```
+
+-->
+
+
+
+
+
+
+
+
+
+
+
+

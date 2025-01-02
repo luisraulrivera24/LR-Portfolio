@@ -1,0 +1,110 @@
+---
+title: "My Simple Logistic Regression"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+<!-- Find some data of interest to you that can be analyzed with a logistic regression. Complete your Logistic Regression Analysis using this file. 
+
+Hint, run the command 
+
+> data() 
+
+in your Console to see available datasets in R that you could use for this Analysis. You are also welcome to collect data yourself, or find other available datasets online for this Analysis. Just be careful to not use anyone else's "analysis" for this Analysis. Also, no conducting surveys unless you have IRB approval to do so. -->
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(plotly)
+library(mosaic)
+library(alr4)
+library(ResourceSelection)
+library(pander)
+library(DT)
+
+
+```
+## Background/The Data
+
+The following analysis is of exercise histories of 138 teenage girls hospitalized for eating disorders and 98 teenage girls in the control group. The data for each teenage girl was collected at 2 year intervals with the oldest age at 17.92 years old. The exercise for each teenage girl is recorded as total amount of hours of exercise each week. The data set below shows the amount of exercise of each teenage girl, age, and the group. 
+
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+Blackmore1<-select(Blackmore, c('age','exercise','group'))
+
+datatable(Blackmore1, options=list(lengthMenu = c(10,10,10,10,10)), extensions="Responsive")
+
+```
+
+## Logistic Model
+
+The logistic model below tells us the probability that a teenage girl will have an eating disorder based off of the amount of exercise (in hours) that she does a week.
+$$
+  P(Y_i = 1|x_i) = \frac{e^{\beta_0+\beta_1 x_i}}{1+e^{\beta_0 + \beta_1 x_i}} = \pi_i
+$$
+In this model, for the previous girls hospitalized and not hospitalized i:
+
+* $Y_i = 1$ means that the teenage girl has an eating disorder,
+
+* $Y_i=0$ means that the teenage girl does not have an eating disorder, and
+
+* $x_i$ is the amount of exercise per week in hours of the teenage girl.
+
+If $\beta_1$ equals zero then this means that the amount of exercise of teenage girls does not help us in figuring out their probabilities of having an eating disorder. However, if $\beta_1$ does not equal zero, then this means that the exercise of teenage girls has an important role in determining their probability of having an eating disorder. Here is the hypothesis written:
+
+$$
+  H_0: \beta_1 = 0 \\
+  H_a: \beta_1 \neq 0
+$$
+
+My level of significance is: $\alpha=0.05$
+
+### Fitting the Model
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+Blackmore1.glm <- glm(group=="patient" ~ exercise, data=Blackmore1, family=binomial)
+summary(Blackmore1.glm) %>% pander()
+
+```
+$$
+  P(Y_i = 1|x_i) \approx \frac{e^{0.1197  + 0.168   x_i}}{1+e^{0.1197  + 0.168  x_i}} = \hat{\pi}_i
+$$
+
+The estimates of the coefficients β0 and β1 are shown above. The estimated model is showing that $b_0 = 0.1197$. This value is the estimate of the Y-intercept ($\beta_0$). Furthermore, $b_1$ = 0.168. This value is the estimate of the slope ($\beta_1$). The slope is defined as the hours of exercise per week. The p-value for exercise is significant since it is less than the alpha. This means that we have sufficient evidence to conclude $\beta_1 \neq 0$. The amount of exercise teenage girls do affects their probability of having an eating disorder.   
+
+### Visualizing the Model
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+plot(group=="patient" ~ exercise, xlab="Exercise (In hours)", main="Probability of Teenage Girls Having an \n Eating-Disorder Based on  Amount of Exercise", data=Blackmore1)
+curve(exp(0.1197 +  0.168*x)/(1 + exp(0.1197 +  0.168*x)), add = TRUE)
+
+```
+
+The plot above shows the probability of teenage girls having an eating disorder based off of the amount of exercise that they do per week. We are able to plot this logistic regression because of the data provided on the number of teenage girls that get hospitalized because of an eating disorder and  those that do not have an eating disorder, and the amount of exercise the teenage girls did per week from both groups. 
+
+### Diagnosing the Model
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, id=FALSE}
+
+#This is how to check and figure out what Goodness-of-fit Test to use:
+#sum(duplicated(Blackmore1))
+
+hoslem.test(Blackmore1.glm$y, Blackmore1.glm$fitted, g=10) %>% pander()
+
+```
+
+In order to see if a logistic regression of the data is appropriate, I perform a Hosmer-Lemeshow Goodness of Fit Test. The reason why I use the Hosmer-Lemeshow Goodness of Fit Test is because there are only a couple repeated $x$-values. Based on the results of the Hosmer-Lemeshow Goodness of Fit Test the p-value is 0.05857. This is above the alpha. This means that the logistic regression of the data is a good fit and that it is appropriate.
+
+## Conclusion
+
+$e^{b_1} = e^{0.168} \approx 1.18$. This shows that the odds of a teenage girl having an eating disorder increase by a factor of 1.18 for every 1 hour increase in exercise per week. In other words, the odds of having an eating disorder increase by 18% (1.18-1) for every 1 hour increase in exercise a week. If we look at this from a reverse perspective, every 1 hour decrease in exercise decreases the odds of an eating disorder by a factor of e-0.168≈0.85. Now, let's make a prediction. If a teenage girl exercises 10 hours per week, the probability of her having an eating disorder is $\hat{\pi_i} \approx$ 0.858. There is probably another explanatory variable(s) that best serves to explain the probability of teenage girls having an eating disorder. The reason why I say this is because we know that scientifically it has been proven that exercise is good, except if you overwork your body. It doesn't make sense that the probability of a teenage girl having an eating disorder is so high if she exercises 10 hours per week. 10 hours per week of exercise is not overdoing it. 
+
+```{r}
+pred <- predict(Blackmore1.glm, data.frame(exercise=10), type='response')
+
+```
+

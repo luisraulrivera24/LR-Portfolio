@@ -1,0 +1,104 @@
+---
+title: "Chi-Squared Test"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+
+<!-- Directions
+
+Come up with a chi squared test analysis of your own creation. 
+
+* Write the Background and clearly state your question. Then collect data and perform the chi-squared test analysis in order to answer your question. Use the proper order of first, ask the question, then second, figure out the answer.
+
+* You can use data from 
+    - An R data set
+    - the internet (like weather data, Facebook data, or sports data) 
+    - your own experiment 
+    - your own observational study
+* However,     
+    - Do not violate the "Human Subjects Rules" of the university: http://www.byui.edu/executive-strategy-and-planning/institutional-research/research-and-assessments/research-and-surveys
+
+* You need a sample size large enough to meet the requirements of the chi squared test. Unfortunately, the sample size is completely dependent on the situation you select. A good rule of thumb is 10 observations per "combination-group" in your data.
+
+-->
+
+```{r, warning=FALSE, message=FALSE}
+library(readr)
+library(tidyverse)
+library(pander)
+
+GSS2012 <- read_delim("../../Data/GSS2012.csv", 
+                      "\t", escape_double = FALSE, trim_ws = TRUE)
+
+GSS <- select(GSS2012, c(pray,spanking))
+
+GSS <- filter(GSS, pray %in% c(3,4,5,6) & spanking %in% c(1,2,3,4))
+
+GSS <- GSS %>% 
+  mutate(pray = case_when(pray == 3 ~ "Several Times/Week", pray == 4 ~ "Once/Week", pray == 5 ~ "Less Than Once/Week", pray == 6 ~ "Never"))
+
+GSS <- GSS %>% 
+  mutate(spanking = case_when(spanking == 2 ~ "Agree", spanking == 3 ~ "Disagree"))
+
+tableout <- table (GSS$spanking, GSS$pray)
+
+tableout <- tableout[,c("Several Times/Week","Once/Week","Less Than Once/Week","Never")]
+
+```
+
+## Background
+
+A survey was conducted recording the amount of prayers people offer a week and whether they agree or disagree about disciplining a child by spanking them.
+
+## Question & Hypothesis
+
+The question I am trying to answer through this Chi-squared test is: are the amount of prayers a week and beliefs about spanking a child associated?
+
+$$
+  H_{0}:\ \text{Amount of prayers a week and beliefs about spanking are not associated.}
+$$
+
+$$
+  H_{a1}:\ \text{Amount of prayers a week and beliefs about spanking are associated.}
+$$
+
+$\alpha = 0.05$
+
+## Data Analysis
+
+Here is a table below of the results for number of prayers a week per person and whether they agree or disagree with disciplining a child through spanking. I thought that as number of prayers per week increase, there would be less people that agree in disciplining through spanking. However, this is not necessarily the case in the table. I also thought that as number of prayers per week increase, there would be more people that disagree with disciplining through spanking. 
+
+```{r, warning=FALSE, message=FALSE}
+tableout %>% pander()
+
+```
+
+As you can see below, my expected counts are all greater than 5. This means that the requirements are met. We can assume that the χ2 test statistic is following a chi-squared distribution with the degrees of freedom as p=(r−1)×(c−1). Furthermore, after conducting the Chi-squared test, our results are showing that we fail to reject the null hypothesis.The P-value is greater than the alpha (P-value= 0.1458). This means that the survey results for amount of prayers a week and whether they agree or disagree about spanking children to discipline them are not associated. We have insufficient evidence to reject the null hypothesis.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+GSS1 <- chisq.test(tableout)
+
+GSS1 %>% pander()
+
+GSS2 <- GSS1$expected
+
+GSS2 %>% pander()
+
+```
+
+## Graphics
+
+As previously mentioned, we failed to reject the null hypothesis. I thought that the more someone prays the less likely they are to agree with disciplining a child through spanking. However, the barplot shows otherwise. To give an example, in the barplot there are more people who never pray and have more people that disagree with disciplining children through spanking than those that pray several times a week. There are people that pray less than once a week and have higher disagree's for disciplining children through spanking than people that pray once a week. However, there is not much variation in the data to be able to have a Chi-squared test with a significant P-value.
+
+```{r, warning=FALSE, message=FALSE}
+barplot(tableout, beside=TRUE, legend.text=TRUE,args.legend=list(x="topleft", cex=.6), ylim=c(0,80), xlab="Amount of Prayers per Week", ylab="Views on Disciplining Children Through Spanking", main="The Amount of Prayers per Person \n and Their Views on Disciplining Through Spanking")
+
+```
+
+## Interpretation
+
+We ended up failing to reject the null hypothesis. This means that there is no association between number of prayers a week and views on disciplining a child through spanking. Furthermore, my barplot shows how I was wrong in assuming that the groups that pray more frequently disagree more in disciplining children through spanking than the group that never prays. 
