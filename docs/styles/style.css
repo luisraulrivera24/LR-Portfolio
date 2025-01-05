@@ -3,7 +3,7 @@
 html {
   padding-top: 1%;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-align: center;
+  /* text-align: center; */
   color: #f8fafc;
   background-color: #0f172a;
 }
@@ -20,6 +20,7 @@ body {
 /* statistics project section */
 .first-header {
   width: 45%;
+  /* align-items: left; */
   text-align: left;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   margin: 0;
