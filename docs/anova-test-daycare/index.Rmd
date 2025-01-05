@@ -22,7 +22,7 @@ library(tidyverse)
 # the top right corner of this gray R-Chunk. 
 
 ## Wide data from original article:
-late <- read.csv("../../Data/late.csv", header=TRUE) 
+late <- read.csv("C:/Users/lrive/OneDrive/Documents/GitHub/LR-Portfolio/MATH 325 Intermediate Statistics Projects/Statistics-Notebook-master/Statistics-Notebook-master/Data/late.csv", header=TRUE) 
 
 ## Change to "long" data for use in R:
 Late <- pivot_longer(late, #Start with wide data set late
@@ -40,7 +40,7 @@ Late <- pivot_longer(late, #Start with wide data set late
 
 <!--If you want to give your critiquers some ideas about what you have questions on and would like help with, place those details here.-->
 
-**Comments to Critiquers:** 
+<!--**Comments to Critiquers:**-->
 
 
 <!--End your comments to your critiquers before this line.-->
